@@ -17,16 +17,22 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
     super.initState();
 
     catController = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
 
-    catAnimation = Tween(begin: 0.0, end: 100.0).animate(CurvedAnimation(
+    catAnimation = Tween(begin: -35.0, end: -80.0).animate(CurvedAnimation(
       parent: catController,
       curve: Curves.easeIn,
     ));
+  }
 
-    catController.forward();
+  onTap() {
+    if (catController.status == AnimationStatus.completed) {
+      catController.reverse();
+    } else if (catController.status == AnimationStatus.dismissed) {
+      catController.forward();
+    }
   }
 
   @override
@@ -35,20 +41,41 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
       appBar: AppBar(
         title: const Text('Animation!'),
       ),
-      body: buildAnimation(),
+      body: GestureDetector(
+        onTap: onTap,
+        child: Center(
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              buildCatAnimation(),
+              buildBox(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget buildAnimation() {
+  Widget buildCatAnimation() {
     return AnimatedBuilder(
       animation: catAnimation,
       builder: (context, child) {
-        return Container(
-          margin: EdgeInsets.only(top: catAnimation.value),
-          child: child,
+        return Positioned(
+          top: catAnimation.value,
+          left: 0.0,
+          right: 0.0,
+          child: child!,
         );
       },
       child: const Cat(),
+    );
+  }
+
+  Widget buildBox() {
+    return Container(
+      height: 200.0,
+      width: 200.0,
+      color: Colors.brown,
     );
   }
 }
